@@ -3,8 +3,8 @@ import styled, { css } from 'styled-components';
 import NextLink from 'next/link';
 
 const BASE_URL = 'http://alurakut.vercel.app/';
+//const URL_LOGO = 'https://raw.githubusercontent.com/edsonmaiap/maiakut2021/7e48f5864a3aba89b6e9152e160069ebe35d791a/src/images';
 const v = '1';
-
 
 function Link({ href, children, ...props }) {
   return (
@@ -35,9 +35,9 @@ export function AlurakutMenu({ githubUser }) {
         </nav>
 
         <nav>
-          <a href={`/logout`}>
-            Sair
-          </a>
+          <Link href={`/logout`}>
+            {`Sair`}
+          </Link>
           <div>
             <input placeholder="Pesquisar no Orkut" />
           </div>
@@ -255,7 +255,7 @@ export function OrkutNostalgicIconSet(props) {
           </span>
           <span className="OrkutNostalgicIconSet__number" style={{ gridArea: 'number' }}>
             <img key={`orkut__icon_set__${slug}_img`} className="OrkutNostalgicIconSet__iconSample" src={`https://alurakut.vercel.app/icons/${icon}.svg`} />
-            {props[slug] ? props[slug] : 0}
+            {props[slug] ? props[slug] : 1}
           </span>
         </li>
       ))}
@@ -264,7 +264,7 @@ export function OrkutNostalgicIconSet(props) {
         { name: 'Legal', slug: 'legal', icon: 'cool' },
         { name: 'Sexy', slug: 'sexy', icon: 'heart' },
       ].map(({ name, slug, icon }) => {
-        const total = props[slug] ? props[slug] : 2;
+        const total = props[slug] ? props[slug] : 3;
         return (
           <li key={`orkut__icon_set__${slug}`}>
             <span className="OrkutNostalgicIconSet__title">

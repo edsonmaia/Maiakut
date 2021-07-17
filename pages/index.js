@@ -1,25 +1,26 @@
 import React from 'react';
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/MaiakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 
-function ProfileSideBar(propriedades) {
+function ProfileSidebar(propriedades) {
   return (
     <Box as="aside">
 
-      <img src={`https://github.com/${propriedades.gitHubUser}.png`} alt="Foto Perfil" />
+      <img src={`https://github.com/${propriedades.githubUser}.png`} style={{ borderRadius: '8px' }} />
       <hr />
 
       <p>
-        <a className="boxLink" href={`https://github.com/${propriedades.gitHubUser}`} >
-          @{propriedades.gitHubUser}
+        <a className="boxLink" href={`https://github.com/${propriedades.githubUser}`}>
+          @{propriedades.githubUser}
         </a>
       </p>
       <hr />
 
       <AlurakutProfileSidebarMenuDefault />
-
     </Box>
   )
 }
@@ -46,11 +47,10 @@ function ProfileRelationsBox(propriedades) {
   )
 }
 
-export default function Home() {
+export default function Home(props) {
 
-  const gitHubUser = 'edsonmaia';
-  
-  const usuarioAleatorio = 'edsonmaia';
+  //const gitHubUser = 'edsonmaia';
+  const usuarioAleatorio = props.githubUser;
 
   const [comunidades, setComunidades] = React.useState([]);
 
@@ -114,10 +114,10 @@ export default function Home() {
     
   return (
     <>
-      <AlurakutMenu githubUser={'edsonmaia'} />
+      <AlurakutMenu githubUser={usuarioAleatorio} />
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }} >
-          <ProfileSideBar gitHubUser={gitHubUser} />
+          <ProfileSidebar githubUser={usuarioAleatorio} />
         </div>
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }} >
           <Box>
@@ -188,7 +188,7 @@ export default function Home() {
               Comunidades ({comunidades.length})
             </h2>
             <ul>
-              {comunidades.map((itemAtual) => {
+              {comunidades.slice(0,6).map((itemAtual) => {
                 return (
                   <li key={itemAtual.id}>
                     <a href={`/communities/${itemAtual.id}`}>
@@ -204,14 +204,14 @@ export default function Home() {
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">Pessoas da Comunidade ({pessoasFavoritas.length}) </h2>
             <ul>
-              {pessoasFavoritas.map((itemAtual) => {
+              {pessoasFavoritas.slice(0,6).map((itemAtual) => {
                 return (
-                    <li key={itemAtual}>
-                      <a href={`/users/${itemAtual}`}>
-                        <img src={`https://github.com/${itemAtual}.png`} />
-                        <span>{itemAtual}</span>
-                      </a>
-                    </li>
+                  <li key={itemAtual}>
+                    <a href={`/users/${itemAtual}`}>
+                      <img src={`https://github.com/${itemAtual}.png`} />
+                      <span>{itemAtual}</span>
+                    </a>
+                  </li>
                 )
               })}
             </ul>
@@ -221,4 +221,35 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(ctx) {
+  const cookies = nookies.get(ctx);
+  const token = cookies.USER_TOKEN;
+  const decodedToken = jwt.decode(token);
+  const githubUser = decodedToken?.githubUser;
+
+  if (!githubUser) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+  }
+
+  // const followers = await fetch(`https://api.github.com/users/${githubUser}/followers`)
+  //   .then((res) => res.json())
+  //   .then(followers => followers.map((follower) => ({
+  //     id: follower.id,
+  //     name: follower.login,
+  //     image: follower.avatar_url,
+  //   })));
+
+  return {
+    props: {
+      githubUser,
+    }
+  }
+
 }
